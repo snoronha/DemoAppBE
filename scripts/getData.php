@@ -12,7 +12,7 @@ function main() {
 
 
     $urls = [
-        'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200',
+        'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=20',
         'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200&page=2',
         'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200&page=3',
         'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=vegetables&count=200',
@@ -47,8 +47,8 @@ function main() {
         $flatProds = getData($url);
         for ($j = 0; $j < count($flatProds); $j++) {
             $product = $flatProds[$j];
-            if (!isset($allProds[$product['USItemId']])) {
-                $allProds[$product['USItemId']] = $product;
+            if (!isset($allProds[$product['us_item_id']])) {
+                $allProds[$product['us_item_id']] = $product;
             }
         }
         printf("Count = %d\n", count($allProds));
@@ -60,21 +60,19 @@ function main() {
 }
 
 function saveToDB($mysqli, $products) {
-    $prodKeys  = array_keys($products);
-    $product   = $products[$prodKeys[0]];
     $headers =  [
-        'USItemId', 'offerId', 'sku', 'salesUnit', 'name', 'name_lc',
-        'thumbnail', 'weightIncrement', 'averageWeight', 'maxAllowed', 'productUrl',
-        'isSnapEligible', 'type', 'rating', 'reviewsCount', 'isOutOfStock', 
-        'list', 'previousPrice', 'priceUnitOfMeasure', 'salesUnitOfMeasure', 'salesQuantity',
-        'displayCondition', 'displayPrice', 'displayUnitPrice', 'isClearance', 'isRollback', 'unit',
+        'us_item_id', 'offer_id', 'sku', 'sales_unit', 'name', 'name_lc',
+        'thumbnail', 'weight_increment', 'average_weight', 'max_allowed', 'product_url',
+        'is_snap_eligible', 'type', 'rating', 'reviews_count', 'is_out_of_stock', 
+        'list', 'previous_price', 'price_unit_of_measure', 'sales_unit_of_measure', 'sales_quantity',
+        'display_condition', 'display_price', 'display_unit_price', 'is_clearance', 'is_rollback', 'unit',
     ];
     $stmt = $mysqli->prepare(
-        "INSERT INTO item (USItemId, offerId, sku, salesUnit, name, name_lc,
-                           thumbnail, weightIncrement, averageWeight, maxAllowed, productUrl,
-                           isSnapEligible, type, rating, reviewsCount, isOutOfStock,
-                           list, previousPrice, priceUnitOfMeasure, salesUnitOfMeasure, salesQuantity,
-                           displayCondition, displayPrice, displayUnitPrice, isClearance, isRollback, unit )
+        "INSERT INTO items (us_item_id, offer_id, sku, sales_unit, name, name_lc,
+            thumbnail, weight_increment, average_weight, max_allowed, product_url,
+            is_snap_eligible, type, rating, reviews_count, is_out_of_stock,
+            list, previous_price, price_unit_of_measure, sales_unit_of_measure, sales_quantity,
+            display_condition, display_price, display_unit_price, is_clearance, is_rollback, unit)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     );
@@ -86,12 +84,12 @@ function saveToDB($mysqli, $products) {
             }
         }
         $stmt->bind_param('sssssssddisisdisddssisdssss', 
-            $p['USItemId'], $p['offerId'], $p['sku'], $p['salesUnit'], $p['name'], $p['name_lc'],
-            $p['thumbnail'], $p['weightIncrement'], $p['averageWeight'], $p['maxAllowed'], $p['productUrl'],
-            $p['isSnapEligible'], $p['type'], $p['rating'], $p['reviewsCount'], $p['isOutOfStock'], 
-            $p['list'], $p['previousPrice'], $p['priceUnitOfMeasure'], $p['salesUnitOfMeasure'], $p['salesQuantity'],
-            $p['displayCondition'], $p['displayPrice'], $p['displayUnitPrice'], $p['isClearance'], 
-            $p['isRollback'], $p['unit']
+            $p['us_item_id'], $p['offer_id'], $p['sku'], $p['sales_unit'], $p['name'], $p['name_lc'],
+            $p['thumbnail'], $p['weight_increment'], $p['average_weight'], $p['max_allowed'], $p['product_url'],
+            $p['is_snap_eligible'], $p['type'], $p['rating'], $p['reviews_count'], $p['is_out_of_stock'], 
+            $p['list'], $p['previous_price'], $p['price_unit_of_measure'], $p['sales_unit_of_measure'], $p['sales_quantity'],
+            $p['display_condition'], $p['display_price'], $p['display_unit_price'], $p['is_clearance'], 
+            $p['is_rollback'], $p['unit']
         );
         $stmt->execute();
     }
@@ -144,34 +142,34 @@ function getData($url) {
         $detailed = $product->{'detailed'};
         $store    = $product->{'store'};
         $price    = $store->{'price'};
-        $obj = array(
-            "USItemId"             => $product->{'USItemId'},
-            "offerId"              => $product->{'offerId'},
-            "sku"                  => isset($product->{'sku'}) ? $product->{'sku'} : "NULL",
-            "salesUnit"            => $basic->{'salesUnit'} ? $basic->{'salesUnit'} : "NULL",
-            "name"                 => $basic->{'name'},
-            "name_lc"              => stemString(strtolower($basic->{'name'})),
-            "thumbnail"            => $basic->{'image'}->{'thumbnail'},
-            "weightIncrement"      => $basic->{'weightIncrement'} ? $basic->{'weightIncrement'} : "NULL",
-            "averageWeight"        => $basic->{'averageWeight'} ? $basic->{'averageWeight'} : "NULL",
-            "maxAllowed"           => $basic->{'maxAllowed'} ? $basic->{'maxAllowed'} : "NULL",
-            "productUrl"           => $basic->{'productUrl'} ? $basic->{'productUrl'} : "NULL",
-            "isSnapEligible"       => $basic->{'isSnapEligible'} ? $basic->{'isSnapEligible'} : "NULL",
-            "type"                 => $basic->{'type'} ? $basic->{'type'} : "NULL",
-            "rating"               => isset($detailed->{'rating'}) ? $detailed->{'rating'} : "NULL",
-            "reviewsCount"         => isset($detailed->{'reviewsCount'}) ? $detailed->{'reviewsCount'} : "NULL",
-            "isOutOfStock"         => $store->{'isOutOfStock'} ? $store->{'isOutOfStock'} : "NULL",
-            "list"                 => $price->{'list'} ? $price->{'list'} : "NULL",
-            "previousPrice"        => $price->{'previousPrice'} ? $price->{'previousPrice'} : "NULL",
-            "priceUnitOfMeasure"   => $price->{'priceUnitOfMeasure'} ? $price->{'priceUnitOfMeasure'} : "NULL",
-            "salesUnitOfMeasure"   => $price->{'salesUnitOfMeasure'} ? $price->{'salesUnitOfMeasure'} : "NULL",
-            "salesQuantity"        => $price->{'salesQuantity'} ? $price->{'salesQuantity'} : "NULL",
-            "displayCondition"     => $price->{'displayCondition'} ? $price->{'displayCondition'} : "NULL",
-            "displayPrice"         => $price->{'displayPrice'} ? $price->{'displayPrice'} : "NULL",
-            "displayUnitPrice"     => $price->{'displayUnitPrice'} ? $price->{'displayUnitPrice'} : "NULL",
-            "isClearance"          => $price->{'isClearance'} ? $price->{'isClearance'} : "NULL",
-            "isRollback"           => $price->{'isRollback'} ? $price->{'isRollback'} : "NULL",
-            "unit"                 => $price->{'unit'} ? $price->{'unit'} : "NULL",
+        $obj      = array(
+            "us_item_id"            => $product->{'USItemId'},
+            "offer_id"              => isset($product->{'offerId'}) ? $product->{'offerId'} : "NULL",
+            "sku"                   => isset($product->{'sku'}) ? $product->{'sku'} : "NULL",
+            "sales_unit"            => $basic->{'salesUnit'} ? $basic->{'salesUnit'} : "NULL",
+            "name"                  => $basic->{'name'},
+            "name_lc"               => stemString(strtolower($basic->{'name'})),
+            "thumbnail"             => $basic->{'image'}->{'thumbnail'},
+            "weight_increment"      => $basic->{'weightIncrement'} ? $basic->{'weightIncrement'} : "NULL",
+            "average_weight"        => $basic->{'averageWeight'} ? $basic->{'averageWeight'} : "NULL",
+            "max_allowed"           => $basic->{'maxAllowed'} ? $basic->{'maxAllowed'} : "NULL",
+            "product_url"           => $basic->{'productUrl'} ? $basic->{'productUrl'} : "NULL",
+            "is_snap_eligible"      => $basic->{'isSnapEligible'} ? $basic->{'isSnapEligible'} : "NULL",
+            "type"                  => $basic->{'type'} ? $basic->{'type'} : "NULL",
+            "rating"                => isset($detailed->{'rating'}) ? $detailed->{'rating'} : "NULL",
+            "reviews_count"         => isset($detailed->{'reviewsCount'}) ? $detailed->{'reviewsCount'} : "NULL",
+            "is_out_of_stock"       => $store->{'isOutOfStock'} ? $store->{'isOutOfStock'} : "NULL",
+            "list"                  => $price->{'list'} ? $price->{'list'} : "NULL",
+            "previous_price"        => $price->{'previousPrice'} ? $price->{'previousPrice'} : "NULL",
+            "price_unit_of_measure" => $price->{'priceUnitOfMeasure'} ? $price->{'priceUnitOfMeasure'} : "NULL",
+            "sales_unit_of_measure" => $price->{'salesUnitOfMeasure'} ? $price->{'salesUnitOfMeasure'} : "NULL",
+            "sales_quantity"        => isset($price->{'salesQuantity'}) ? $price->{'salesQuantity'} : "NULL",
+            "display_condition"     => $price->{'displayCondition'} ? $price->{'displayCondition'} : "NULL",
+            "display_price"         => $price->{'displayPrice'} ? $price->{'displayPrice'} : "NULL",
+            "display_unit_price"    => $price->{'displayUnitPrice'} ? $price->{'displayUnitPrice'} : "NULL",
+            "is_clearance"          => $price->{'isClearance'} ? $price->{'isClearance'} : "NULL",
+            "is_rollback"           => $price->{'isRollback'} ? $price->{'isRollback'} : "NULL",
+            "unit"                  => $price->{'unit'} ? $price->{'unit'} : "NULL",
         );
         $flatProds[] = $obj;
     }

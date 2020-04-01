@@ -7,17 +7,17 @@ import (
 )
 
 func main() {
-    r := gin.Default()
+    router := gin.Default()
 
     db := models.SetupModels() // new
 
     // Provide db variable to controllers
-    r.Use(func(c *gin.Context) {
+    router.Use(func(c *gin.Context) {
         c.Set("db", db)
         c.Next()
     })
 
-    r.GET("/items", controllers.FindItems) // new
+    router.GET("/items", controllers.FindItems) // new
 
-    r.Run()
+    router.Run()
 }
