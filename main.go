@@ -17,6 +17,7 @@ func main() {
         c.Next()
     })
 
+    router.GET("/home", controllers.HomeItems)
     router.GET("/items", controllers.FindItems) // new
     router.GET("/items/search", controllers.SearchItems)
 
