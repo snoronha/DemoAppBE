@@ -1,9 +1,10 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "DemoAppBE/models"
-    "DemoAppBE/controllers"
+	"DemoAppBE/controllers"
+	"DemoAppBE/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
     })
 
     router.GET("/home", controllers.HomeItems)
+    router.GET("/item/:id", controllers.FindItem) // new
     router.GET("/items", controllers.FindItems) // new
     router.GET("/items/search", controllers.SearchItems)
 

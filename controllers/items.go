@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"DemoAppBE/models"
 	"net/http"
+	"strconv"
 	"strings"
-  	"github.com/gin-gonic/gin"
+
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/reiver/go-porterstemmer"
-	"strconv"
-  	"DemoAppBE/models"
 )
 
 // GET /home carousels
@@ -57,6 +58,15 @@ func FindItems(c *gin.Context) {
   	db.Limit(limit).Offset(offset).Order("id asc").Find(&items)
 
   	c.JSON(http.StatusOK, gin.H{"items": items})
+}
+
+// GET /item/:id
+func FindItem(c *gin.Context) {
+	db     := c.MustGet("db").(*gorm.DB)
+	id, _  := strconv.ParseInt(c.Param("id"), 10, 64)
+	var item models.Item
+	db.Where("id = ?", id).First(&item)
+	c.JSON(http.StatusOK, gin.H{"item": item})
 }
 
 // GET /items/search?kwd=<keyword>
