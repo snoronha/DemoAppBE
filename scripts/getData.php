@@ -12,7 +12,7 @@ function main() {
 
 
     $urls = [
-        'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=20',
+        'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200',
         'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200&page=2',
         'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200&page=3',
         'https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=vegetables&count=200',

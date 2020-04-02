@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"DemoAppBE/models"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,9 +29,12 @@ func HomeItems(c *gin.Context) {
     	"Nuts & Dried Fruit",
 	}
 	db       := c.MustGet("db").(*gorm.DB)
+	limit    := 50
+	randPage := 1 + rand.Intn(20)
+	offset   := (randPage - 1) * limit
 	var items []models.Item
 	var carousels []Carousel
-	db.Limit(50).Find(&items)
+	db.Limit(limit).Offset(offset).Find(&items)
 	count := 0;
 	for i := 0; i < 8; i++ {
 		carousel := new(Carousel)
