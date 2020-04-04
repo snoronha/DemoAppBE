@@ -30,4 +30,5 @@ type Item struct {
     IsClearance        string  `json:"isClearance"`
     IsRollback         string  `json:"isRollback"`
     Unit               string  `json:"unit"`
+    Favorite           bool    `json:"favorite"`
 }

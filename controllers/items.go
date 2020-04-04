@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"DemoAppBE/models"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -35,12 +36,29 @@ func HomeItems(c *gin.Context) {
 	var items []models.Item
 	var carousels []Carousel
 	db.Limit(limit).Offset(offset).Find(&items)
+
+	// Get this user's favorites
+	userId := 1  // this will be an input param
+	var favs []models.Favorite
+	db.Where("user_id = ?", userId).Find(&favs)
+	favMap := make(map[uint]bool)
+	cnt := 0;
+	for _, fav := range favs { // fav map {itemId1: true, itemId2: true}
+		favMap[fav.ItemId] = true
+		cnt++
+	}
+	log.Printf("CNT = %d\n", cnt)
 	count := 0;
 	for i := 0; i < 8; i++ {
 		carousel := new(Carousel)
 		carousel.Title = carouselTitles[i]
 		carouselItems := new([]models.Item)
 		for j := 0; j < 6; j++ {
+			if _, ok := favMap[items[count].ID]; ok {
+				items[count].Favorite = true
+			} else {
+				items[count].Favorite = false
+			}
 			*carouselItems = append(*carouselItems, items[count])
 			count++
 		}
