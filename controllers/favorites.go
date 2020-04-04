@@ -28,20 +28,34 @@ func ReadFavorites(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"favorites": favorites})
 }
 
-// POST /favorites
-func InsertFavorites(c *gin.Context) {
-	db  := c.MustGet("db").(*gorm.DB)
+// POST /favorites/:item_id
+func InsertOrDeleteFavorites(c *gin.Context) {
+	db         := c.MustGet("db").(*gorm.DB)
+	action     := c.DefaultQuery("action", "insert")
 	var favorite models.Favorite
 	err := c.BindJSON(&favorite)
 	if err != nil {
 		log.Print(err)
 	}
-	db.Create(&favorite)
-	fail      := db.NewRecord(favorite) // check if insert succeeded
-	if ! fail {
-		c.JSON(http.StatusOK, gin.H{"error": ""})
+	if action == "delete" {
+		// result := db.Where("item_id = ? and user_id = ?", favorite.ItemId, favorite.UserId).Delete(Favorite{})
+		// result := db.Delete(Favorite{}, "item_id = ? and user_id = ?", favorite.ItemId, favorite.UserId)
+		rows, err  := db.Raw(`DELETE from favorites
+	                        WHERE  user_id = ? and item_id = ?`, favorite.UserId, favorite.ItemId).Rows()
+		defer rows.Close()
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "delete unsuccessfull"})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"error": ""})
+		}
 	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "record exists"})
+		db.Create(&favorite)
+		fail      := db.NewRecord(favorite) // check if insert succeeded
+		if ! fail {
+			c.JSON(http.StatusOK, gin.H{"error": ""})
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "record exists"})
+		}
 	}
 }
 
