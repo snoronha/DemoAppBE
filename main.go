@@ -10,7 +10,7 @@ import (
 func main() {
     router := gin.Default()
 
-    db := models.SetupModels() // new
+    db := models.SetupModels()
 
     // Provide db variable to controllers
     router.Use(func(c *gin.Context) {
@@ -22,6 +22,9 @@ func main() {
     router.GET("/item/:id", controllers.FindItem) // new
     router.GET("/items", controllers.FindItems) // new
     router.GET("/items/search", controllers.SearchItems)
+
+    router.GET("/favorites/:user_id", controllers.ReadFavorites)
+    router.POST("/favorites", controllers.InsertFavorites)
 
     router.Run()
 }
