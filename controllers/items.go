@@ -80,8 +80,9 @@ func SearchItems(c *gin.Context) {
 	kwd        := c.DefaultQuery("kwd", "apple")
 	stemmed    := strings.ToLower(porterstemmer.StemString(kwd))
 	searchTerm := "%" + stemmed + "%"
-	var items []models.Item
-	db.Where("name_lc like ?", searchTerm).Find(&items)
-
+	var items []models.Item = make([]models.Item, 0)
+	if len(stemmed) > 0 {
+		db.Where("name_lc like ?", searchTerm).Find(&items)
+	}
 	c.JSON(http.StatusOK, gin.H{"count": len(items), "items": items})
 }
