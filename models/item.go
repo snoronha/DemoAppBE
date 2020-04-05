@@ -30,5 +30,7 @@ type Item struct {
     IsClearance        string  `json:"isClearance"`
     IsRollback         string  `json:"isRollback"`
     Unit               string  `json:"unit"`
-    Favorite           bool    `json:"favorite"`
+    Favorite           bool    `json:"favorite"` // from Favorite
+    Quantity           uint    `json:"quantity"` // from OrderItem
+    OrderId            uint    `json:"orderId"`  // from OrderItem
 }

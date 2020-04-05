@@ -15,6 +15,8 @@ func SetupModels() *gorm.DB {
 
 	// db.AutoMigrate(&Item{})
 	db.AutoMigrate(&Favorite{})
+	db.AutoMigrate(&OrderItem{})
+	db.AutoMigrate(&Order{})
 
   	return db
 }
