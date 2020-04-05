@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"DemoAppBE/models"
-	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -19,7 +18,7 @@ func HomeItems(c *gin.Context) {
 		Title string        `json:"title"`
 		Items []models.Item `json:"items"`
 	}
-	carouselTitles := [8]string{
+	carouselTitles := []string{
     	"Featured Items",
     	"Reorder Your Essentials",
     	"Healthy Snacking",
@@ -42,12 +41,9 @@ func HomeItems(c *gin.Context) {
 	var favs []models.Favorite
 	db.Where("user_id = ?", userId).Find(&favs)
 	favMap := make(map[uint]bool)
-	cnt := 0;
 	for _, fav := range favs { // fav map {itemId1: true, itemId2: true}
 		favMap[fav.ItemId] = true
-		cnt++
 	}
-	log.Printf("CNT = %d\n", cnt)
 	count := 0;
 	for i := 0; i < 8; i++ {
 		carousel := new(Carousel)

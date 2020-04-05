@@ -3,6 +3,7 @@ package controllers
 import (
 	"DemoAppBE/models"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -14,17 +15,71 @@ import (
 func ReadFavorites(c *gin.Context) {
 	db         := c.MustGet("db").(*gorm.DB)
 	userId, _  := strconv.ParseInt(c.Param("user_id"), 10, 64)
-	
-	var favorites []models.Item
+	type Department struct {
+		Title string        `json:"title"`
+		Items []models.Item `json:"items"`
+	}
+	favDepts   := []string{
+	    "Fruits & Vegetables",
+    	"Snacks & Candy",
+    	"Household Essentials",
+    	"Beverages",
+    	"Meat",
+    	"Frozen",
+    	"Eggs & Dairy",
+    	"Pantry",
+    	"Beauty & Personal Care",
+    	"Pets",
+    	"School Lunch Bix Essentials",
+    	"Health & Nutrition",
+    	"Party Supplies & Crafts",
+    	"Sports & Outdoor",
+    	"Baby",
+    	"Bread & Bakery",
+    	"Deli",
+    	"Garden & Tools",
+    	"Groceries & Household Essentials",
+    	"Organic Shop",
+    	"More",
+	}
+
+	// Get this user's favorites
+	var favs []models.Favorite
+	db.Where("user_id = ?", userId).Find(&favs)
+	favMap := make(map[uint]bool)
+	for _, fav := range favs { // fav map {itemId1: true, itemId2: true}
+		favMap[fav.ItemId] = true
+	}
+
+	// Set up departments
+	var favorites []Department
 	rows, _  := db.Raw(`SELECT items.* from items, favorites 
 	                    WHERE  items.id = favorites.item_id and favorites.user_id = ?`, userId).Rows()
 	defer rows.Close()
+	deptMap := make(map[string]int) // map deptName => index in favorites
 	for rows.Next() {
 		var item models.Item
-  		db.ScanRows(rows, &item)
-  		favorites = append(favorites, item)
+		db.ScanRows(rows, &item)
+		if _, ok := favMap[item.ID]; ok {
+			item.Favorite = true
+		} else {
+			item.Favorite = false
+		}
+		randIdx  := rand.Intn(len(favDepts))
+		randDept := favDepts[randIdx]
+		if _, ok := deptMap[randDept]; ok {
+			// department exists in result, so append item
+			deptIndex := deptMap[randDept]
+			favorites[deptIndex].Items = append(favorites[deptIndex].Items, item)
+		} else {
+			// department does not exist, add to result + add item
+			deptMap[randDept] = len(favorites)
+			items := []models.Item{}
+			items  = append(items, item)
+			dept  := Department{Title: randDept, Items: items}
+			favorites = append(favorites, dept)
+		}
 	}
-
 	c.JSON(http.StatusOK, gin.H{"favorites": favorites})
 }
 
@@ -59,20 +114,6 @@ func InsertOrDeleteFavorites(c *gin.Context) {
 	}
 }
 
-// GET /items
-// Get all items
-/*
-func SaveFavorite(c *gin.Context) {
-  	db       := c.MustGet("db").(*gorm.DB)
-	limit, _ := strconv.ParseInt(c.DefaultQuery("limit", "60"), 10, 64)
-	page, _  := strconv.ParseInt(c.DefaultQuery("page", "1"), 10, 64)
-	offset   := (page - 1) * limit
-  	var items []models.Item
-  	db.Limit(limit).Offset(offset).Order("id asc").Find(&items)
-
-  	c.JSON(http.StatusOK, gin.H{"items": items})
-}
-
 // GET /item/:id
 func IsFavorite(c *gin.Context) {
 	db     := c.MustGet("db").(*gorm.DB)
@@ -81,4 +122,3 @@ func IsFavorite(c *gin.Context) {
 	db.Where("id = ?", id).First(&item)
 	c.JSON(http.StatusOK, gin.H{"item": item})
 }
-*/
