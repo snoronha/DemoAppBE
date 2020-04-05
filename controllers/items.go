@@ -73,7 +73,23 @@ func FindItems(c *gin.Context) {
 	page, _  := strconv.ParseInt(c.DefaultQuery("page", "1"), 10, 64)
 	offset   := (page - 1) * limit
   	var items []models.Item
-  	db.Limit(limit).Offset(offset).Order("id asc").Find(&items)
+	db.Limit(limit).Offset(offset).Order("id asc").Find(&items)
+	  
+	// Get this user's favorites and merge in
+	userId := 1  // this will be an input param
+	var favs []models.Favorite
+	db.Where("user_id = ?", userId).Find(&favs)
+	favMap := make(map[uint]bool)
+	for _, fav := range favs { // fav map {itemId1: true, itemId2: true}
+		favMap[fav.ItemId] = true
+	}
+	for _, item := range items {
+		if _, ok := favMap[item.ID]; ok {
+			item.Favorite = true
+		} else {
+			item.Favorite = false
+		}
+	}
 
   	c.JSON(http.StatusOK, gin.H{"items": items})
 }
@@ -97,6 +113,23 @@ func SearchItems(c *gin.Context) {
 	var items []models.Item = make([]models.Item, 0)
 	if len(stemmed) > 0 {
 		db.Where("name_lc like ?", searchTerm).Find(&items)
+
+		// Get this user's favorites and merge in
+		userId := 1  // this will be an input param
+		var favs []models.Favorite
+		db.Where("user_id = ?", userId).Find(&favs)
+		favMap := make(map[uint]bool)
+		for _, fav := range favs { // fav map {itemId1: true, itemId2: true}
+			favMap[fav.ItemId] = true
+		}
+		for idx, _ := range items {
+			if _, ok := favMap[items[idx].ID]; ok {
+				items[idx].Favorite = true
+			} else {
+				items[idx].Favorite = false
+			}
+		}
 	}
+	
 	c.JSON(http.StatusOK, gin.H{"count": len(items), "items": items})
 }
