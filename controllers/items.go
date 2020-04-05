@@ -83,11 +83,11 @@ func FindItems(c *gin.Context) {
 	for _, fav := range favs { // fav map {itemId1: true, itemId2: true}
 		favMap[fav.ItemId] = true
 	}
-	for _, item := range items {
+	for idx, item := range items {
 		if _, ok := favMap[item.ID]; ok {
-			item.Favorite = true
+			items[idx].Favorite = true
 		} else {
-			item.Favorite = false
+			items[idx].Favorite = false
 		}
 	}
 
@@ -122,8 +122,8 @@ func SearchItems(c *gin.Context) {
 		for _, fav := range favs { // fav map {itemId1: true, itemId2: true}
 			favMap[fav.ItemId] = true
 		}
-		for idx, _ := range items {
-			if _, ok := favMap[items[idx].ID]; ok {
+		for idx, item := range items {
+			if _, ok := favMap[item.ID]; ok {
 				items[idx].Favorite = true
 			} else {
 				items[idx].Favorite = false
