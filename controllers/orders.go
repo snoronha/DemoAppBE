@@ -52,11 +52,16 @@ func UpsertOrderItem(c *gin.Context) {
 	if err != nil {
 		log.Print(err)
 	}
-	db.Where(models.OrderItem{OrderId: uint(orderId)}).Assign(models.OrderItem{Quantity: order_item.Quantity}).FirstOrCreate(&order_item)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "upsert unsuccessful"})
+	order      := models.Order{Status: "open"}
+	db.Where(models.Order{ID: uint(orderId)}).FirstOrCreate(&order)
+	if order_item.Quantity <= 0 {
+		rows, _  := db.Raw(`DELETE from order_items
+	                        WHERE  order_id = ? and item_id = ?`, order_item.OrderId, order_item.ItemId).Rows()
+		defer rows.Close()
+		c.JSON(http.StatusOK, gin.H{"order_item": order_item})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"error": ""})
+		db.Where(models.OrderItem{ItemId: uint(order_item.ItemId)}).Assign(models.OrderItem{Quantity: order_item.Quantity}).FirstOrCreate(&order_item)
+		c.JSON(http.StatusOK, gin.H{"order_item": order_item})
 	}
 }
 
