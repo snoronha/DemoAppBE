@@ -3,7 +3,6 @@ package controllers
 import (
 	"DemoAppBE/models"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -28,19 +27,9 @@ func ReadFavorites(c *gin.Context) {
     	"Frozen",
     	"Eggs & Dairy",
     	"Pantry",
-    	"Beauty & Personal Care",
-    	"Pets",
-    	"School Lunch Bix Essentials",
-    	"Health & Nutrition",
-    	"Party Supplies & Crafts",
-    	"Sports & Outdoor",
     	"Baby",
     	"Bread & Bakery",
-    	"Deli",
-    	"Garden & Tools",
     	"Groceries & Household Essentials",
-    	"Organic Shop",
-    	"More",
 	}
 
 	// Get this user's favorites
@@ -54,9 +43,12 @@ func ReadFavorites(c *gin.Context) {
 	// Set up departments
 	var favorites []Department
 	rows, _  := db.Raw(`SELECT items.* from items, favorites 
-	                    WHERE  items.id = favorites.item_id and favorites.user_id = ?`, userId).Rows()
+						WHERE  items.id = favorites.item_id and favorites.user_id = ?
+						ORDER  by items.id asc`, userId).Rows()
 	defer rows.Close()
-	deptMap := make(map[string]int) // map deptName => index in favorites
+	deptMap   := make(map[string]int) // map deptName => index in favorites
+	count     := 0
+	numDepts  := len(favDepts)
 	for rows.Next() {
 		var item models.Item
 		db.ScanRows(rows, &item)
@@ -65,8 +57,9 @@ func ReadFavorites(c *gin.Context) {
 		} else {
 			item.Favorite = false
 		}
-		randIdx  := rand.Intn(len(favDepts))
-		randDept := favDepts[randIdx]
+		
+		// randIdx  := rand.Intn(len(favDepts))
+		randDept := favDepts[count % numDepts]
 		if _, ok := deptMap[randDept]; ok {
 			// department exists in result, so append item
 			deptIndex := deptMap[randDept]
@@ -79,6 +72,7 @@ func ReadFavorites(c *gin.Context) {
 			dept  := Department{Title: randDept, Items: items}
 			favorites = append(favorites, dept)
 		}
+		count++
 	}
 	c.JSON(http.StatusOK, gin.H{"favorites": favorites})
 }
@@ -96,7 +90,7 @@ func InsertOrDeleteFavorites(c *gin.Context) {
 		// result := db.Where("item_id = ? and user_id = ?", favorite.ItemId, favorite.UserId).Delete(Favorite{})
 		// result := db.Delete(Favorite{}, "item_id = ? and user_id = ?", favorite.ItemId, favorite.UserId)
 		rows, err  := db.Raw(`DELETE from favorites
-	                        WHERE  user_id = ? and item_id = ?`, favorite.UserId, favorite.ItemId).Rows()
+	                          WHERE  user_id = ? and item_id = ?`, favorite.UserId, favorite.ItemId).Rows()
 		defer rows.Close()
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "delete unsuccessfull"})
