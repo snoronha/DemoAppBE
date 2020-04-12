@@ -166,7 +166,8 @@ func main() {
         "https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=snacks&count=200&page=2",
         "https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=snacks&count=200&page=3",
         "https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=snacks&count=200&page=4",
-        "https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=snacks&count=200&page=5",
+		"https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=snacks&count=200&page=5",
+		"https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=freshiq&count=200",
 	}
 
 	for _, url := range urls {
