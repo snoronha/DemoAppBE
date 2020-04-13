@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -15,7 +17,15 @@ import (
 )
 
 func GetDB() *gorm.DB {
-    file, _ := ioutil.ReadFile("../conf.json")
+    fullPath := os.Getenv("GOPATH") + "/src/DemoAppBE"
+    absFile, err := filepath.Abs(fullPath + "/conf.json")
+    if err != nil {
+        panic("Failed to get absolute path")
+    }
+    file, fileErr := ioutil.ReadFile(absFile)
+    if fileErr != nil {
+        panic("Failed to read conf.json")
+    }
     type Conf struct{
         DBUser     string
         DBPassword string
@@ -24,13 +34,16 @@ func GetDB() *gorm.DB {
     }
 
     conf := Conf{}
-    _ = json.Unmarshal([]byte(file), &conf)
+    err   = json.Unmarshal([]byte(file), &conf)
+    if err != nil {
+        panic("Failed to read unmarshal json")
+    }
 
     dbStr   := fmt.Sprintf(
         "%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", 
         conf.DBUser, conf.DBPassword, conf.DBHost, conf.DBName,
     )
-
+    fmt.Println("DBSTR = " + dbStr) 
 	db, err := gorm.Open("mysql", dbStr)
 	if err != nil {
 	  panic("Failed to connect: " + err.Error())
