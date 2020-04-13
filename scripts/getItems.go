@@ -1,18 +1,14 @@
 package main
 
 import (
+	"DemoAppBE/util"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/reiver/go-porterstemmer"
 )
 
 type Image struct {
@@ -134,12 +130,11 @@ type Item struct {
 */
 
 func main() {
-	db      := getDB()
+	db      := util.GetDB()
 	itemMap := make(map[string]Item)
 	client  := http.Client{
 		Timeout: time.Second * 5, // Maximum of 2 secs
 	}
-	// url := "https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=20"
 	urls    := []string{
 		"https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200",
         "https://grocery.walmart.com/v4/api/products/search?storeId=2119&query=fruit&count=200&page=2",
@@ -171,7 +166,7 @@ func main() {
 	}
 
 	for _, url := range urls {
-		body := getUrltext(url, client)
+		body := util.GetUrltext(url, client)
 		var items Items
 		err := json.Unmarshal(body, &items)
 		if err != nil {
@@ -192,14 +187,6 @@ func main() {
 	saveToDB(db, itemMap)
 }
 
-func getDB() *gorm.DB {
-	db, err := gorm.Open("mysql", "root:root@(localhost)/DemoApp?charset=utf8&parseTime=True&loc=Local")
-	if err != nil {
-	  panic("Failed to connect: " + err.Error())
-	}
-	return db
-}
-
 func saveToDB(db *gorm.DB, itemMap map[string]Item) {
 	for _, item := range itemMap {
 		db.Create(&item)
@@ -207,7 +194,7 @@ func saveToDB(db *gorm.DB, itemMap map[string]Item) {
 }
 
 func flattenItem(item ObjItem) Item {
-	nameLc := stemSentence(*item.Basic.Name)
+	nameLc := util.StemSentence(*item.Basic.Name)
 	return Item{
 		USItemId:           item.USItemId,
 		OfferId:            item.OfferId,
@@ -237,40 +224,4 @@ func flattenItem(item ObjItem) Item {
 		IsRollback:         item.Store.Price.IsRollback,
 		Unit:               item.Store.Price.Unit,
 	}
-}
-
-func stemSentence(str string) string {
-	reg, err    := regexp.Compile("[^a-zA-Z]+")
-	strs        := strings.Fields(str)
-	if err != nil {
-        log.Fatal(err)
-    }
-	stemmedStrs := []string{}
-	for _, word := range strs {
-		stemmedWord := reg.ReplaceAllString(word, "")
-		stemmedWord  = porterstemmer.StemString(strings.ToLower(stemmedWord))
-		stemmedStrs  = append(stemmedStrs, stemmedWord)
-	}
-	return strings.Join(stemmedStrs[:], " ")
-}
-
-func getUrltext(url string, client http.Client) []byte {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	req.Header.Set("User-Agent", "spacecount-tutorial")
-
-	res, getErr := client.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
-	}
-
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-
-	return body
 }
