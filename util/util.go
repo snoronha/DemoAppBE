@@ -43,7 +43,6 @@ func GetDB() *gorm.DB {
         "%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", 
         conf.DBUser, conf.DBPassword, conf.DBHost, conf.DBName,
     )
-    fmt.Println("DBSTR = " + dbStr) 
 	db, err := gorm.Open("mysql", dbStr)
 	if err != nil {
 	  panic("Failed to connect: " + err.Error())
