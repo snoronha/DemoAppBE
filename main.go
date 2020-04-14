@@ -22,6 +22,7 @@ func main() {
     router.GET("/item/:id", controllers.FindItem) // new
     router.GET("/items", controllers.FindItems) // new
     router.GET("/items/search", controllers.SearchItems)
+    router.GET("/item_detail/:item_id", controllers.GetItemDetail)
 
     router.GET("/favorites/:user_id", controllers.ReadFavorites)
     router.POST("/favorites/:item_id", controllers.InsertOrDeleteFavorites)
