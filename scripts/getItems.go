@@ -184,10 +184,10 @@ func main() {
 
 	// save itemMap to db
 	fmt.Printf("Saving to DB\n")
-	saveToDB(db, itemMap)
+	saveItemsToDB(db, itemMap)
 }
 
-func saveToDB(db *gorm.DB, itemMap map[string]Item) {
+func saveItemsToDB(db *gorm.DB, itemMap map[string]Item) {
 	for _, item := range itemMap {
 		db.Create(&item)
 	}
