@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -84,4 +85,26 @@ func StemSentence(str string) string {
 		stemmedStrs  = append(stemmedStrs, stemmedWord)
 	}
 	return strings.Join(stemmedStrs[:], " ")
+}
+
+// Distance in meters between (lat1, lng1) and (lat2, lng2)
+func Distance(lat1, lng1, lat2, lng2 float64) float64 {
+	// convert to radians
+  	// must cast radius as float to multiply later
+	var la1, ln1, la2, ln2, r float64
+	la1 = lat1 * math.Pi / 180
+	ln1 = lng1 * math.Pi / 180
+	la2 = lat2 * math.Pi / 180
+	ln2 = lng2 * math.Pi / 180
+
+	r = 6378100 // Earth radius in METERS
+
+	// calculate
+	h := hsin(la2-la1) + math.Cos(la1)*math.Cos(la2)*hsin(ln2-ln1)
+	return 2 * r * math.Asin(math.Sqrt(h))
+}
+
+// haversin(θ) function
+func hsin(theta float64) float64 {
+	return math.Pow(math.Sin(theta/2), 2)
 }

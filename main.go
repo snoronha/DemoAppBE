@@ -30,5 +30,7 @@ func main() {
     router.GET("/order/:order_id/user/:user_id", controllers.ReadOrder)
     router.POST("/order_item/:order_id", controllers.UpsertOrderItem)
 
+    router.GET("/stores/:lat/:lng", controllers.GetStores)
+
     router.Run()
 }
