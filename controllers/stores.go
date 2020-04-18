@@ -27,5 +27,5 @@ func GetStores(c *gin.Context) {
 			nearbyStores = append(nearbyStores, store)
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{"item_detail": nearbyStores})
+	c.JSON(http.StatusOK, gin.H{"stores": nearbyStores})
 }
