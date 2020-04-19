@@ -8,127 +8,129 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 type PrimaryDepartment struct {
-	Id                  *string   `json:"id"`
-	Name                *string   `json:"name"`
+	Id                  *string     `json:"id"`
+	Name                *string     `json:"name"`
 }
 type PrimaryAisle struct {
-	Id                  *string   `json:"id"`
-	Name                *string   `json:"name"`
+	Id                  *string     `json:"id"`
+	Name                *string     `json:"name"`
 }
 type PrimaryShelf struct {
-	Id                  *string   `json:"id"`
-	Name                *string   `json:"name"`
+	Id                  *string     `json:"id"`
+	Name                *string     `json:"name"`
 }
 type Image struct {
-	Thumbnail           *string   `json:"thumbnail"`      //thumbnail
-	Large               *string   `json:"large"`   
+	Thumbnail           *string     `json:"thumbnail"`      //thumbnail
+	Large               *string     `json:"large"`   
 }
 type Price struct {
-	List                *float64  `json:"list"`
-    PriceUnitOfMeasure  *string   `json:"priceUnitOfMeasure"`
-    SalesUnitOfMeasure  *string   `json:"salesUnitOfMeasure"`
-	SalesQuantity       *uint     `json:"salesQuantity"`
-	IsRollback          *string   `json:"isRollback"`
-	IsClearance         *string   `json:"isClearance"`
-	Unit                *float64  `json:"unit"`
-	DisplayPrice        *float64  `json:"displayPrice"`
-	DisplayUnitPrice    *string   `json:"displayUnitPrice"`
+	List                *float64    `json:"list"`
+    PriceUnitOfMeasure  *string     `json:"priceUnitOfMeasure"`
+    SalesUnitOfMeasure  *string     `json:"salesUnitOfMeasure"`
+	SalesQuantity       *uint       `json:"salesQuantity"`
+	IsRollback          *string     `json:"isRollback"`
+	IsClearance         *string     `json:"isClearance"`
+	Unit                *float64    `json:"unit"`
+	DisplayPrice        *float64    `json:"displayPrice"`
+	DisplayUnitPrice    *string     `json:"displayUnitPrice"`
 }
 type Store struct {
-	Price               *Price    `json:"price"`
-	IsInStock           *bool     `json:"isInStock"`
+	Price               *Price      `json:"price"`
+	IsInStock           *bool       `json:"isInStock"`
 }
 type Detailed struct {
-	ProductCode         *string   `json:"productCode"`
-	Brand               *string   `json:"brand"`
-	ProductType         *string   `json:"productType"`
-	ShortDescription    *string   `json:"shortDescription"`
-	Description         *string   `json:"description"`
-	ModelNum            *string   `json:"modelNum"`
+	ProductCode         *string     `json:"productCode"`
+	Brand               *string     `json:"brand"`
+	ProductType         *string     `json:"productType"`
+	ShortDescription    *string     `json:"shortDescription"`
+	Description         *string     `json:"description"`
+	ModelNum            *string     `json:"modelNum"`
 	AssembledInCountryOfOrigin   *string `json:"assembledInCountryOfOrigin"`
-	OriginOfComponents  *string   `json:"originOfComponents"`
-	Ingredients         *string   `json:"ingredients"`
-	AgeRestricted       *bool     `json:"ageRestricted"`
-	StorageType         *string   `json:"storageType"`
-	Weight              *string   `json:"weight"`
-	Rating              *float64  `json:"rating"`
-	ReviewsCount        *uint     `json:"reviewsCount"`
+	OriginOfComponents  *string     `json:"originOfComponents"`
+	Ingredients         *string     `json:"ingredients"`
+	AgeRestricted       *bool       `json:"ageRestricted"`
+	StorageType         *string     `json:"storageType"`
+	Weight              *string     `json:"weight"`
+	Rating              *float64    `json:"rating"`
+	ReviewsCount        *uint       `json:"reviewsCount"`
 }
 type Basic struct {
-	Name                *string   `json:"name"`
-	MaxAllowed          *uint     `json:"maxAllowed"`
-	TaxCode             *string   `json:"taxCode"`
-	IsOutOfStock        *string   `json:"isOutOfStock"`
-	Image               *Image    `json:"image"`
-	IsAlcoholic         *bool     `json:"isAlcoholic"`
-	IsSnapEligible      *uint     `json:"isSnapEligible"`
+	Name                *string     `json:"name"`
+	MaxAllowed          *uint       `json:"maxAllowed"`
+	TaxCode             *string     `json:"taxCode"`
+	IsOutOfStock        *string     `json:"isOutOfStock"`
+	Image               *Image      `json:"image"`
+	IsAlcoholic         *bool       `json:"isAlcoholic"`
+	IsSnapEligible      *uint       `json:"isSnapEligible"`
 	PrimaryShelf        *PrimaryShelf      `json:"primaryShelf"`
 	PrimaryAisle        *PrimaryAisle      `json:"primaryAisle"`
 	PrimaryDepartment   *PrimaryDepartment `json:"primaryDepartment"`
-	SalesUnit           *string   `json:"salesUnit"`
-	ProductUrl          *string   `json:"productUrl"`
-	Type                *string   `json:"type"`
+	SalesUnit           *string     `json:"salesUnit"`
+	ProductUrl          *string     `json:"productUrl"`
+	Type                *string     `json:"type"`
 }
 
 type ItemDetailObj struct {
-	Sku                 *string   `json:"sku"`
-    UsItemId            *string   `json:"UsItemId"`
-	OfferId             *string   `json:"offerId"`
-	Upc                 *string   `json:"upc"`
-	Rank                *uint     `json:"rank"`
-	Basic               *Basic    `json:"basic"`
-	Detailed            *Detailed `json:"detailed"`
-	Store               *Store    `json:"store"`
+	Sku                 *string     `json:"sku"`
+    UsItemId            *string     `json:"UsItemId"`
+	OfferId             *string     `json:"offerId"`
+	Upc                 *string     `json:"upc"`
+	Rank                *uint       `json:"rank"`
+	Basic               *Basic      `json:"basic"`
+	Detailed            *Detailed   `json:"detailed"`
+	NutritionFacts      interface{} `json:"nutritionFacts"`
+	Store               *Store      `json:"store"`
 }
 
 type ItemDetail struct {
-	Sku                 *string  `json:"sku" sql:"type:varchar(32)"`
-    UsItemId            *string  `json:"USItemId" sql:"type:varchar(16)"`
-	OfferId             *string  `json:"offerId" gorm:"type:varchar(64)"`
-	Upc                 *string  `json:"upc" gorm:"type:varchar(32)"`
-	Rank                *uint    `json:"rank"`
-	Name                *string  `json:"name"`
-	MaxAllowed          *uint    `json:"maxAllowed"`
-	TaxCode             *string  `json:"taxCode"`
-	IsOutOfStock        *string  `json:"isOutOfStock"`
-	Thumbnail           *string  `json:"thumbnail"`      //thumbnail
-	Large               *string  `json:"large"`          // large image
-	IsAlcoholic         *bool    `json:"isAlcoholic"`
-	IsSnapEligible      *uint    `json:"isSnapEligible"`
-	PrimaryShelf        *string  `json:"primaryShelf"`
-	PrimaryAisle        *string  `json:"primaryAisle"`
-	PrimaryDepartment   *string  `json:"primaryDepartment"`
-	SalesUnit           *string  `json:"salesUnit"`
-	ProductUrl          *string  `json:"productUrl"`
-	Type                *string  `json:"type"`
-	ProductCode         *string  `json:"productCode"`
-	Brand               *string  `json:"brand"`
-	ProductType         *string  `json:"productType"`
-	ShortDescription    *string  `json:"shortDescription"`
-	Description         *string  `json:"description"`
-	ModelNum            *string  `json:"modelNum"`
+	Sku                 *string     `json:"sku" sql:"type:varchar(32)"`
+    UsItemId            *string     `json:"USItemId" sql:"type:varchar(16)"`
+	OfferId             *string     `json:"offerId" gorm:"type:varchar(64)"`
+	Upc                 *string     `json:"upc" gorm:"type:varchar(32)"`
+	Rank                *uint       `json:"rank"`
+	Name                *string     `json:"name"`
+	MaxAllowed          *uint       `json:"maxAllowed"`
+	TaxCode             *string     `json:"taxCode"`
+	IsOutOfStock        *string     `json:"isOutOfStock"`
+	Thumbnail           *string     `json:"thumbnail"`      // thumbnail
+	Large               *string     `json:"large"`          // large image
+	IsAlcoholic         *bool       `json:"isAlcoholic"`
+	IsSnapEligible      *uint       `json:"isSnapEligible"`
+	PrimaryShelf        *string     `json:"primaryShelf"`
+	PrimaryAisle        *string     `json:"primaryAisle"`
+	PrimaryDepartment   *string     `json:"primaryDepartment"`
+	SalesUnit           *string     `json:"salesUnit"`
+	ProductUrl          *string     `json:"productUrl"`
+	Type                *string     `json:"type"`
+	ProductCode         *string     `json:"productCode"`
+	Brand               *string     `json:"brand"`
+	ProductType         *string     `json:"productType"`
+	ShortDescription    *string     `json:"shortDescription"`
+	Description         *string     `json:"description"`
+	ModelNum            *string     `json:"modelNum"`
 	AssembledInCountryOfOrigin  *string `json:"assembledInCountryOfOrigin"`
-	OriginOfComponents  *string  `json:"originOfComponents"`
-	Ingredients         *string  `json:"ingredients"`
-	AgeRestricted       *bool    `json:"ageRestricted"`
-	StorageType         *string  `json:"storageType"`
-	Weight              *string  `json:"weight"`
-	Rating              *float64 `json:"rating"`
-	ReviewsCount        *uint    `json:"reviewsCount"`
-	List                *float64 `json:"list"`
-    PriceUnitOfMeasure  *string  `json:"priceUnitOfMeasure"`
-    SalesUnitOfMeasure  *string  `json:"salesUnitOfMeasure"`
-	SalesQuantity       *uint    `json:"salesQuantity"`
-	IsRollback          *string  `json:"isRollback"`
-	IsClearance         *string  `json:"isClearance"`
-	Unit                *float64 `json:"unit"`
-	DisplayPrice        *float64 `json:"displayPrice"`
-	DisplayUnitPrice    *string  `json:"displayUnitPrice"`
-	IsInStock           *bool    `json:"isInStock"`
+	OriginOfComponents  *string     `json:"originOfComponents"`
+	Ingredients         *string     `json:"ingredients"`
+	AgeRestricted       *bool       `json:"ageRestricted"`
+	StorageType         *string     `json:"storageType"`
+	Weight              *string     `json:"weight"`
+	Rating              *float64    `json:"rating"`
+	ReviewsCount        *uint       `json:"reviewsCount"`
+	NutritionFacts      string      `json:"nutritionFacts"`
+	List                *float64    `json:"list"`
+    PriceUnitOfMeasure  *string     `json:"priceUnitOfMeasure"`
+    SalesUnitOfMeasure  *string     `json:"salesUnitOfMeasure"`
+	SalesQuantity       *uint       `json:"salesQuantity"`
+	IsRollback          *string     `json:"isRollback"`
+	IsClearance         *string     `json:"isClearance"`
+	Unit                *float64    `json:"unit"`
+	DisplayPrice        *float64    `json:"displayPrice"`
+	DisplayUnitPrice    *string     `json:"displayUnitPrice"`
+	IsInStock           *bool       `json:"isInStock"`
 }
 
 // Use pointers for all nullable fields (else defaults to 0, 0.0, "" in Go)
@@ -175,19 +177,10 @@ func main() {
 		}
 		count++
 	}
-
-	// save itemMap to db
-	// fmt.Printf("Saving to DB\n")
-	// saveToDB(db, itemMap)
-}
-
-func saveToDB(db *gorm.DB, itemMap map[string]ItemDetail) {
-	for _, item := range itemMap {
-		db.Create(&item)
-	}
 }
 
 func flattenItemDetail(item ItemDetailObj) ItemDetail {
+	nutritionFacts, _  := json.Marshal(item.NutritionFacts)
 	if item.Detailed.Description != nil {
 		descr := *item.Detailed.Description
 		if len(descr) >= 2047 {
@@ -258,6 +251,7 @@ func flattenItemDetail(item ItemDetailObj) ItemDetail {
 		Weight:             item.Detailed.Weight,
 		Rating:             item.Detailed.Rating,
 		ReviewsCount:       item.Detailed.ReviewsCount,
+		NutritionFacts:     string(nutritionFacts),
 		List:               item.Store.Price.List,
     	PriceUnitOfMeasure: item.Store.Price.PriceUnitOfMeasure,
     	SalesUnitOfMeasure: item.Store.Price.SalesUnitOfMeasure,

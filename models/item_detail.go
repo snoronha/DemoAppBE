@@ -39,6 +39,7 @@ type ItemDetail struct {
 	Weight              string  `json:"weight"`
 	Rating              float64 `json:"rating"`
 	ReviewsCount        uint    `json:"reviewsCount"`
+	NutritionFacts      string  `json:"nutritionFacts" gorm:"type:varchar(2047)"`
 	List                float64 `json:"list"`
     PriceUnitOfMeasure  string  `json:"priceUnitOfMeasure"`
     SalesUnitOfMeasure  string  `json:"salesUnitOfMeasure"`
