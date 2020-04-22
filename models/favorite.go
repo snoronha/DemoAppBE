@@ -6,6 +6,6 @@ import (
 
 type Favorite struct {
 	ID                 uint    `json:"id" gorm:"primary_key"`
-	ItemId             uint    `json:"itemId"`
+    ItemId             uint    `json:"itemId"`
     UserId             uint    `json:"userId"`
 }
